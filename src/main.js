@@ -1,42 +1,10 @@
 import './index.html';
 import './scss/index.scss';
+import { Tomato } from './js/tomato.js';
 
+const tomato = new Tomato({ timeWorking: 3, timePause: 1, timeBigPause: 2 }, '.main__container');
 
-let count = 0;
-const imp = ['default', 'important', 'so-so']
-document.querySelector('.button-importance').addEventListener('click', ({target}) => {
-  count += 1;
-  if (count >= imp.length) {
-    count = 0
-  }
+const tsak01 =  tomato.addTask( 'Купить машину', 2, 'important');
+const tsak02 = tomato.addTask( 'Постричь газон', 1, 'default');
 
-  for (let i = 0; i < imp.length; i++) {
-    if (count === i) {
-      target.classList.add(imp[i])
-    } else {
-      target.classList.remove(imp[i])
-    }
-  }
-})
-
-class Task {
-    constructor(name, counter) {
-        this.name = name;
-        this.counter = 0;
-        this.id = String(Math.round(Math.random() * (100 + 1)));
-    }
-
-    changeCounter() {
-      return ++this.counter;
-    }
-    setName(name) {
-      this.name = name; 
-      return this;
-    }
-};
-
-const task1 = new Task('Сходить в магазин');
-task1.changeCounter();
-console.log(task1);
-task1.setName('Читать');
-console.log(task1);
+tomato.init();
