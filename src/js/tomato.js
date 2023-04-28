@@ -8,8 +8,14 @@ export class Tomato {
             return Tomato.instance;
         }
         this.time = time;
+        this.work = time.timeWorking;
+        this.break = time.timePause;
+        this.rest = time.timeBigPause;
+        this.timeLeft = time.timeWorking * 60;
+        this.status = 'work';
         this.tasks = [];
         this.aktiveTask = [];
+        this.aktiveTimer = false;
         this.renderApp = renderApp;
         this.renderTomato = null;
         this.controllerTomato = null;
@@ -58,6 +64,12 @@ export class Tomato {
         })
     }
 
+    disactiveTask() {
+        this.aktiveTask = [];
+        this.setRenderTomato();
+        this.setControllerTomato();
+        }
+
     change(id) {
         this.tasks.forEach(task => {
             if (id == task.id) {
@@ -68,40 +80,48 @@ export class Tomato {
         })
     };
 
-    startTimer() {
-        const timerWrap = document.querySelector('.window__timer-text');
-        let timeStart = parseInt(this.time.timeWorking) * 60;
-        const timerId = setInterval(() => {
-            let seconds = timeStart % 60 // Получаем секунды
-            let minutes = timeStart / 60 % 60// Получаем минуты
+   showTime(time) {
+    const timerWrap = document.querySelector('.window__timer-text');
+    let seconds = time % 60;
+    let minutes = Math.trunc(time / 60);
             if (seconds < 10) {
                 seconds = "0" + seconds;
             }
-            let strTimer = `${Math.trunc(minutes)}:${seconds}`;
-            timerWrap.innerHTML = strTimer;
-            timeStart--;
-            if (timeStart === 0) {
-                console.log('Времы выполнения задачи истекло');
-                this.change(this.aktiveTask.id);
+            if (minutes < 10) {
+                minutes = "0" + minutes;
+            }
+        timerWrap.textContent = `${minutes}:${seconds}`;
+    }
+
+
+   startTimer() {
+        if (this.timeLeft > 0 && this.aktiveTimer) {
+        const timerId = setInterval(() => {
+            this.showTime(this.timeLeft);
+            this.timeLeft--;
+            if (!this.aktiveTimer) {
+                console.log('Пауза');
                 clearInterval(timerId);
-                this.setRenderTomato()
-                let timePause;
+            }
+            if (this.timeLeft === 0) {
+               clearInterval(timerId);
+
+               if (this.status === 'work') {
+                this.change(this.aktiveTask.id);
+
                 if (this.aktiveTask.counter % 3 == 0) {
-                    timePause = parseInt(this.time.timeBigPause) * 60;
+                    this.status = 'break';
                 } else {
-                    timePause = parseInt(this.time.timePause) * 60;
+                    this.status = 'rest';
                 }
-                const timerPause = setInterval(() => {
-                    console.log(timePause);
-                    timerWrap.innerHTML = `${Math.trunc(timePause / 60 % 60)}:${timePause % 60}`;
-                    timePause--;
-                    if (timePause <= 0) {
-                        clearInterval(timerPause);
-                        console.log('пауза закончилась, можно продолжить');
-                    }
-                }, 100);
+               } else {
+                this.status = 'work';
+               }
+
+               this.timeLeft = this[this.status] * 60;
+                this.startTimer();
             }
         }, 100);
+     }
     }
 }
-

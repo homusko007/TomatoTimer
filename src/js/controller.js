@@ -9,7 +9,8 @@ export class ControllerTomato {
         this.addNewTask();
         this.addActiveTask();
         this.addImportnace();
-        this.startTask()
+        this.startTask();
+        this.stopTask();
     }
 
     addNewTask() {
@@ -58,15 +59,14 @@ export class ControllerTomato {
                 const activTask = target.closest('.pomodoro-tasks__task-text');
                 activTask.classList.add('pomodoro-tasks__task-text-active');
                 const taskID = target.closest('.pomodoro-tasks__list-task').getAttribute('id');
-                console.log(activTask);
-                console.log(taskID);
                 this.tomato.aktivationTask(`${taskID}`);
-                console.log(this.tomato);
             }
             if (target.closest('.pomodoro-tasks__task-button')) {
-                const popup = target.closest('.burger-popup');
-                console.log(popup);
-                popup.classList.add('burger-popup_active');
+                const popup = document.querySelector('.burger-popup');
+                popup.classList.add('burger-popup_active'),
+                setTimeout(() => 
+                popup.classList.remove('burger-popup_active'),
+                2000);
             }
         });
     }
@@ -75,10 +75,33 @@ export class ControllerTomato {
         const btnStartTask = document.querySelector('.button-primary');
         btnStartTask.addEventListener('click', () => {
             if (this.tomato.aktiveTask.length !== 0) {
-                this.tomato.startTimer();
+                if (this.tomato.aktiveTimer) {
+                    this.tomato.aktiveTimer = false;
+                    btnStartTask.textContent = 'Старт';
+                } else { 
+                    this.tomato.aktiveTimer = true;
+                    this.tomato.startTimer();
+                    btnStartTask.textContent = 'Пауза';
+                }
             } else {
                 alert('Выберите задачу');
             }
         });
     }
+
+    stopTask() {
+        const btnStopTask = document.querySelector('.button-secondary');
+        const btnStartTask = document.querySelector('.button-primary');
+        btnStopTask.addEventListener('click', () => {
+        if (this.tomato.aktiveTask.length !== 0) {
+            this.tomato.disactiveTask();
+            this.tomato.aktiveTimer = false;
+            console.log('stop');
+            btnStartTask.textContent = 'Старт';
+            this.tomato.timeLeft = this.tomato.time.timeWorking * 60;
+            this.tomato.showTime(this.tomato.timeLeft);
+        }
+        })
+}
+
 }

@@ -11,7 +11,8 @@ export class RenderTomato {
         this.wrapper = document.querySelector('.main__container');
         this.activeTaskWindow = document.createElement('div');
         this.activeTaskWindow.classList.add('pomodoro-form', 'window');
-        this.listTask = document.querySelector('.pomodoro-tasks');
+        this.listTask = document.createElement('div');
+        this.listTask.classList.add('pomodoro-tasks');
         this.renderTomato();
     }
 
@@ -20,10 +21,11 @@ export class RenderTomato {
         this.activeTaskWindow.textContent = '';
         this.listTask.textContent = '';
         const tasksList = this.createListTasks();
+        const instruction = this.createInstruction();
         const addTaskForm = this.createForm();
         const activeTask = this.createActiveTask();
         this.activeTaskWindow.append(activeTask, addTaskForm);
-        this.listTask.append(tasksList);
+        this.listTask.append(instruction, tasksList);
         this.wrapper.append(this.activeTaskWindow, this.listTask);
 
     }
@@ -47,12 +49,8 @@ export class RenderTomato {
             } else {
                 taskName.classList.remove('pomodoro-tasks__task-text_active');
             }
-
-
-
             const btnPopup = document.createElement('button');
             btnPopup.classList.add('pomodoro-tasks__task-button');
-
             const popup = document.createElement('div');
             popup.classList.add('burger-popup');
             const btnEdit = document.createElement('button');
@@ -68,6 +66,29 @@ export class RenderTomato {
         })
 
         return list;
+    }
+
+    createInstruction() {
+        const fragment = document.createDocumentFragment();
+        const p = document.createElement('p');
+        p.classList.add('pomodoro-tasks__header-title');
+        p.textContent = 'Инструкция:';
+        const ul = document.createElement('ul');
+        ul.classList.add('pomodoro-tasks__quest-list');
+       
+        ul.innerHTML = `
+        <li class="pomodoro-tasks__list-item">Напишите название задачи чтобы её добавить</li>
+        <li class="pomodoro-tasks__list-item">Чтобы задачу активировать, выберите её из списка</li>
+        <li class="pomodoro-tasks__list-item">Запустите таймер</li>
+        <li class="pomodoro-tasks__list-item">Работайте пока таймер не прозвонит</li>
+        <li class="pomodoro-tasks__list-item">Сделайте короткий перерыв (5 минут)</li>
+        <li class="pomodoro-tasks__list-item">Продолжайте работать, пока задача не будет выполнена.</li>
+        <li class="pomodoro-tasks__list-item">Каждые 4 периода таймера делайте длинный перерыв (15-20 минут).</li>`
+
+      fragment.appendChild(p);
+      fragment.appendChild(ul);
+      console.log(fragment);
+      return fragment;
     }
 
     createForm() {
@@ -89,7 +110,7 @@ export class RenderTomato {
             <p class="window__panel-task-text">Томат ${this.tomato.aktiveTask.counter || ''}</p>
         </div>
         <div class="window__body">
-            <p class="window__timer-text">25:00</p>
+            <p class="window__timer-text">00:00</p>
         <div class="window__buttons">
             <button class="button button-primary">Старт</button>
             <button class="button button-secondary">Стоп</button>
